@@ -1,36 +1,128 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mocap Planning Dashboard
+
+A web-based dashboard for planning and managing motion capture sessions.
+
+## Features
+
+- **Calendar View**: Visual calendar showing all mocap sessions
+- **Session Management**: Create, edit, and delete sessions
+- **Animation List**: Detailed animation tracking with:
+  - Character, shot ID, move name
+  - Duration and description
+  - Performer notes and key poses
+  - Talent and prop requirements
+  - Reference images/videos or links
+  - Priority levels
+- **Checklist**: Preparation checklist by category (equipment, talent, location, files)
+- **Callsheet**: Printable callsheet with session details
+- **Slack Notifications**: Automatic notifications on session changes
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 18+ and npm
+- Git
+
+### Local Development
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd mocap-dashboard
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env.local` with your values:
+- `SLACK_WEBHOOK_URL` (optional): For Slack notifications
+- `NEXT_PUBLIC_APP_URL`: Your app URL (use `http://localhost:3000` for local dev)
 
-## Learn More
+4. Run the development server:
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Setting Up Slack Notifications
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+1. Go to your Slack workspace settings
+2. Create an Incoming Webhook:
+   - Go to https://api.slack.com/messaging/webhooks
+   - Create a new app or use an existing one
+   - Enable Incoming Webhooks
+   - Add to your workspace and select a channel
+   - Copy the Webhook URL
+3. Add the webhook URL to your `.env.local`:
+```
+SLACK_WEBHOOK_URL=https://hooks.slack.com/services/YOUR/WEBHOOK/URL
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Vercel (Recommended)
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push your code to GitHub
+
+2. Connect to Vercel:
+   - Go to [vercel.com](https://vercel.com)
+   - Import your GitHub repository
+   - Deploy
+
+3. Set environment variables in Vercel dashboard:
+   - `SLACK_WEBHOOK_URL`
+   - `NEXT_PUBLIC_APP_URL` (your Vercel deployment URL)
+
+### Self-Hosted
+
+For company internal hosting:
+
+1. Build the application:
+```bash
+npm run build
+```
+
+2. Start the production server:
+```bash
+npm start
+```
+
+3. The app will be available on port 3000. Use nginx or another reverse proxy for production.
+
+**Note:** The database is SQLite and stored in the `data/mocap.db` file. Make sure this directory is persisted between deployments.
+
+## Data Structure
+
+### Session
+- Title, date, time, location
+- Status (planned, confirmed, completed, cancelled)
+- Team members
+- Notes
+
+### Animation
+- Character, shot ID, move name
+- Duration, description
+- Performer instructions
+- Key poses
+- Talent and prop requirements
+- Reference (uploaded file or external link)
+- Priority level
+
+### Checklist
+- Category: equipment, talent, location, files
+- Task description
+- Completion status
+- Owner (optional)
+
+## License
+
+MIT
