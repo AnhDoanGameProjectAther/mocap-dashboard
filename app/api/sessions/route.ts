@@ -1,10 +1,20 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getAllSessions, createSession } from '@/lib/db/operations';
+import { getAllSessions, createSession, initTursoDb } from '@/lib/db/turso';
 import { sendSlackNotification } from '@/lib/slack';
+
+// Initialize database on first request
+let initialized = false;
+async function ensureDb() {
+  if (!initialized) {
+    await initTursoDb();
+    initialized = true;
+  }
+}
 
 export async function GET() {
   try {
-    const sessions = getAllSessions();
+    await ensureDb();
+    const sessions = await getAllSessions();
     return NextResponse.json(sessions);
   } catch (error) {
     console.error('GET /api/sessions error:', error);
@@ -17,10 +27,11 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await ensureDb();
     const body = await request.json();
     console.log('Creating session:', body);
 
-    const session = createSession(body);
+    const session = await createSession(body);
     console.log('Session created:', session);
 
     // Send Slack notification (don't await, let it run in background)

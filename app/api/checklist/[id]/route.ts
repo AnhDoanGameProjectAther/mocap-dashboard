@@ -1,15 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { toggleChecklistItem, deleteChecklistItem, addChecklistItem } from '@/lib/db/operations';
+import { toggleChecklistItem, deleteChecklistItem, initTursoDb } from '@/lib/db/turso';
+
+let initialized = false;
+async function ensureDb() {
+  if (!initialized) {
+    await initTursoDb();
+    initialized = true;
+  }
+}
 
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
+    await ensureDb();
     const body = await request.json();
-    toggleChecklistItem(params.id, body.completed);
+    await toggleChecklistItem(params.id, body.completed);
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('PATCH /api/checklist/[id] error:', error);
     return NextResponse.json({ error: 'Failed to update checklist item' }, { status: 500 });
   }
 }
@@ -19,9 +29,11 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    deleteChecklistItem(params.id);
+    await ensureDb();
+    await deleteChecklistItem(params.id);
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('DELETE /api/checklist/[id] error:', error);
     return NextResponse.json({ error: 'Failed to delete checklist item' }, { status: 500 });
   }
 }

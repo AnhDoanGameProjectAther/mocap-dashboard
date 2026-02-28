@@ -1,18 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession, getSessionWithDetails, updateSession, deleteSession } from '@/lib/db/operations';
+import { getSessionWithDetails, updateSession, deleteSession, initTursoDb } from '@/lib/db/turso';
 import { sendSlackNotification } from '@/lib/slack';
+
+let initialized = false;
+async function ensureDb() {
+  if (!initialized) {
+    await initTursoDb();
+    initialized = true;
+  }
+}
 
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = getSessionWithDetails(params.id);
+    await ensureDb();
+    const session = await getSessionWithDetails(params.id);
     if (!session) {
       return NextResponse.json({ error: 'Session not found' }, { status: 404 });
     }
     return NextResponse.json(session);
   } catch (error) {
+    console.error('GET /api/sessions/[id] error:', error);
     return NextResponse.json({ error: 'Failed to fetch session' }, { status: 500 });
   }
 }
@@ -22,28 +32,19 @@ export async function PATCH(
   { params }: { params: { id: string } }
 ) {
   try {
-    const oldSession = getSession(params.id);
-    if (!oldSession) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
-    }
-
+    await ensureDb();
     const body = await request.json();
-    const session = updateSession(params.id, body);
+    const session = await updateSession(params.id, body);
 
-    // Send Slack notification for significant changes
-    const significantChanges = ['date', 'startTime', 'endTime', 'location', 'status'];
-    const hasSignificantChange = significantChanges.some(key => key in body);
-
-    if (hasSignificantChange) {
-      await sendSlackNotification({
-        type: 'session_updated',
-        session,
-        changes: body,
-      });
-    }
+    sendSlackNotification({
+      type: 'session_updated',
+      session,
+      changes: body,
+    }).catch(err => console.error('Slack notification error:', err));
 
     return NextResponse.json(session);
   } catch (error) {
+    console.error('PATCH /api/sessions/[id] error:', error);
     return NextResponse.json({ error: 'Failed to update session' }, { status: 500 });
   }
 }
@@ -53,20 +54,19 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = getSession(params.id);
-    if (!session) {
-      return NextResponse.json({ error: 'Session not found' }, { status: 404 });
+    await ensureDb();
+    const session = await getSessionWithDetails(params.id);
+    if (session) {
+      await deleteSession(params.id);
+
+      sendSlackNotification({
+        type: 'session_deleted',
+        session,
+      }).catch(err => console.error('Slack notification error:', err));
     }
-
-    deleteSession(params.id);
-
-    await sendSlackNotification({
-      type: 'session_deleted',
-      session,
-    });
-
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error('DELETE /api/sessions/[id] error:', error);
     return NextResponse.json({ error: 'Failed to delete session' }, { status: 500 });
   }
 }
