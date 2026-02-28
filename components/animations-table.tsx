@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Plus, Trash2, ExternalLink, Upload, GripVertical } from 'lucide-react';
+import { Plus, Trash2, ExternalLink, Upload, GripVertical, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Animation } from '@/types';
 
 interface AnimationsTableProps {
@@ -42,41 +43,63 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
     priority: 'Medium',
   });
 
+  const [error, setError] = useState<string | null>(null);
+
   const handleSubmit = async () => {
-    if (isAdding) {
-      await fetch('/api/animations', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ...formData,
-          sessionId,
-          order: animations.length,
-        }),
+    setError(null);
+    try {
+      if (isAdding) {
+        const res = await fetch('/api/animations', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ...formData,
+            sessionId,
+            order: animations.length,
+          }),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || data.details || 'Failed to create animation');
+        }
+        setIsAdding(false);
+      } else if (editingId) {
+        const res = await fetch(`/api/animations/${editingId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        });
+        if (!res.ok) {
+          const data = await res.json();
+          throw new Error(data.error || data.details || 'Failed to update animation');
+        }
+        setEditingId(null);
+      }
+      setFormData({
+        character: '',
+        shotId: '',
+        moveName: '',
+        duration: '',
+        description: '',
+        performerNotes: '',
+        keyPoses: '',
+        talentRequired: '',
+        props: '',
+        referenceType: 'link',
+        referenceUrl: '',
+        priority: 'Medium',
       });
-      setIsAdding(false);
-    } else if (editingId) {
-      await fetch(`/api/animations/${editingId}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      });
-      setEditingId(null);
+      onUpdate();
+    } catch (err) {
+      console.error('Failed to save animation:', err);
+      setError(err instanceof Error ? err.message : 'An unexpected error occurred');
     }
-    setFormData({
-      character: '',
-      shotId: '',
-      moveName: '',
-      duration: '',
-      description: '',
-      performerNotes: '',
-      keyPoses: '',
-      talentRequired: '',
-      props: '',
-      referenceType: 'link',
-      referenceUrl: '',
-      priority: 'Medium',
-    });
-    onUpdate();
+  };
+
+  const handleClose = () => {
+    setIsAdding(false);
+    setEditingId(null);
+    setError(null);
   };
 
   const handleDelete = async (id: string) => {
@@ -274,11 +297,17 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
       </div>
 
       {(isAdding || editingId) && (
-        <Dialog open={true} onOpenChange={() => { setIsAdding(false); setEditingId(null); }}>
+        <Dialog open={true} onOpenChange={handleClose}>
           <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>{isAdding ? 'Add Animation' : 'Edit Animation'}</DialogTitle>
             </DialogHeader>
+            {error && (
+              <Alert variant="destructive" className="mt-4">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>{error}</AlertDescription>
+              </Alert>
+            )}
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
@@ -380,7 +409,7 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
               </div>
             </div>
             <div className="flex justify-end gap-2">
-              <Button variant="outline" onClick={() => { setIsAdding(false); setEditingId(null); }}>
+              <Button variant="outline" onClick={handleClose}>
                 Cancel
               </Button>
               <Button onClick={handleSubmit}>
