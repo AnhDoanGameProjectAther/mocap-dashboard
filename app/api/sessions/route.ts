@@ -1,41 +1,40 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { initDb } from '@/lib/db';
 import { getAllSessions, createSession } from '@/lib/db/operations';
 import { sendSlackNotification } from '@/lib/slack';
 
-// Initialize database on first request
-let initialized = false;
-function ensureDb() {
-  if (!initialized) {
-    initDb();
-    initialized = true;
-  }
-}
-
 export async function GET() {
-  ensureDb();
   try {
     const sessions = getAllSessions();
     return NextResponse.json(sessions);
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to fetch sessions' }, { status: 500 });
+    console.error('GET /api/sessions error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch sessions', details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: NextRequest) {
-  ensureDb();
   try {
     const body = await request.json();
-    const session = createSession(body);
+    console.log('Creating session:', body);
 
-    // Send Slack notification
-    await sendSlackNotification({
+    const session = createSession(body);
+    console.log('Session created:', session);
+
+    // Send Slack notification (don't await, let it run in background)
+    sendSlackNotification({
       type: 'session_created',
       session,
-    });
+    }).catch(err => console.error('Slack notification error:', err));
 
     return NextResponse.json(session, { status: 201 });
   } catch (error) {
-    return NextResponse.json({ error: 'Failed to create session' }, { status: 500 });
+    console.error('POST /api/sessions error:', error);
+    return NextResponse.json(
+      { error: 'Failed to create session', details: error instanceof Error ? error.message : String(error) },
+      { status: 500 }
+    );
   }
 }
