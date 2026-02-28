@@ -135,6 +135,24 @@ export function deleteSession(id: string): void {
 export function createAnimation(data: Omit<Animation, 'id'>): Animation {
   const id = uuidv4();
 
+  // Provide defaults for nullable fields
+  const animationData = {
+    character: data.character || '',
+    shotId: data.shotId || '',
+    moveName: data.moveName || '',
+    duration: data.duration || '',
+    description: data.description || '',
+    performerNotes: data.performerNotes || '',
+    keyPoses: data.keyPoses || '',
+    talentRequired: data.talentRequired || '',
+    props: data.props || '',
+    referenceType: data.referenceType || 'link',
+    referenceUrl: data.referenceUrl || '',
+    priority: data.priority || 'Medium',
+    order: data.order ?? 0,
+    sessionId: data.sessionId,
+  };
+
   const stmt = db.prepare(`
     INSERT INTO animations (id, sessionId, character, shotId, moveName, duration, description, performerNotes, keyPoses, talentRequired, props, referenceType, referenceUrl, priority, "order")
     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -142,23 +160,23 @@ export function createAnimation(data: Omit<Animation, 'id'>): Animation {
 
   stmt.run(
     id,
-    data.sessionId,
-    data.character,
-    data.shotId,
-    data.moveName,
-    data.duration,
-    data.description,
-    data.performerNotes,
-    data.keyPoses,
-    data.talentRequired,
-    data.props,
-    data.referenceType,
-    data.referenceUrl,
-    data.priority,
-    data.order
+    animationData.sessionId,
+    animationData.character,
+    animationData.shotId,
+    animationData.moveName,
+    animationData.duration,
+    animationData.description,
+    animationData.performerNotes,
+    animationData.keyPoses,
+    animationData.talentRequired,
+    animationData.props,
+    animationData.referenceType,
+    animationData.referenceUrl,
+    animationData.priority,
+    animationData.order
   );
 
-  return { ...data, id };
+  return { ...animationData, id };
 }
 
 export function updateAnimation(id: string, data: Partial<Animation>): Animation {
