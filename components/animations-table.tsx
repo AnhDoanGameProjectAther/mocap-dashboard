@@ -239,14 +239,14 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-auto max-h-[500px]">
+      <div className="border rounded-lg overflow-auto max-h-[calc(100vh-220px)]">
         <Table className="w-max min-w-full">
-          <TableHeader className="sticky top-0 bg-background z-10">
-            <TableRow>
-              <TableHead className="w-10 text-center">#</TableHead>
-              <TableHead className="w-20">Priority</TableHead>
-              <TableHead className="w-28">Character</TableHead>
-              <TableHead className="w-24">Shot ID</TableHead>
+          <TableHeader className="sticky top-0 z-20">
+            <TableRow className="bg-muted/50">
+              <TableHead className="w-10 text-center sticky left-0 z-30 bg-muted/50 border-r">#</TableHead>
+              <TableHead className="w-20 sticky left-[40px] z-30 bg-muted/50 border-r">Priority</TableHead>
+              <TableHead className="w-28 sticky left-[120px] z-30 bg-muted/50 border-r">Character</TableHead>
+              <TableHead className="w-24 sticky left-[232px] z-30 bg-muted/50 border-r shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)]">Shot ID</TableHead>
               <TableHead className="w-40">Move Name</TableHead>
               <TableHead className="w-20">Duration</TableHead>
               <TableHead className="w-64">Description</TableHead>
@@ -265,14 +265,14 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => openEdit(anim)}
               >
-                <TableCell className="text-muted-foreground text-center align-top">{idx + 1}</TableCell>
-                <TableCell className="align-top">
+                <TableCell className="text-muted-foreground text-center align-top sticky left-0 z-10 bg-background border-r">{idx + 1}</TableCell>
+                <TableCell className="align-top sticky left-[40px] z-10 bg-background border-r">
                   <Badge className={`${priorityColors[anim.priority]} text-white text-xs`}>
                     {anim.priority}
                   </Badge>
                 </TableCell>
-                <TableCell className="whitespace-normal break-words align-top">{anim.character}</TableCell>
-                <TableCell className="font-mono text-sm whitespace-normal break-words align-top">{anim.shotId}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top sticky left-[120px] z-10 bg-background border-r">{anim.character}</TableCell>
+                <TableCell className="font-mono text-sm whitespace-normal break-words align-top sticky left-[232px] z-10 bg-background border-r shadow-[4px_0_8px_-4px_rgba(0,0,0,0.1)]">{anim.shotId}</TableCell>
                 <TableCell className="font-medium whitespace-normal break-words align-top">{anim.moveName}</TableCell>
                 <TableCell className="whitespace-normal break-words align-top">{anim.duration}</TableCell>
                 <TableCell className="whitespace-normal break-words align-top">{anim.description}</TableCell>
