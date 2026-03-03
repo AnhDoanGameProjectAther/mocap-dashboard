@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import type { Character } from '@/types';
+import { CSVImportDialog } from './csv-import-dialog';
 
 interface CharactersSectionProps {
   sessionId: string;
@@ -120,10 +121,18 @@ export function CharactersSection({ sessionId, characters, onUpdate }: Character
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Characters ({characters.length})</h3>
-        <Button onClick={openAdd}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Character
-        </Button>
+        <div className="flex gap-2">
+          <CSVImportDialog
+            sessionId={sessionId}
+            type="characters"
+            onSuccess={onUpdate}
+            buttonLabel="Import CSV"
+          />
+          <Button onClick={openAdd}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Character
+          </Button>
+        </div>
       </div>
 
       {characters.length === 0 ? (

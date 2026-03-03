@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import type { Session, CallsheetInfo } from '@/types';
+import { CSVImportDialog } from './csv-import-dialog';
 
 interface CallsheetProps {
   session: Session;
@@ -55,6 +56,12 @@ export function CallsheetView({ session, callsheet, onUpdate }: CallsheetProps) 
       <div className="flex justify-between items-center no-print">
         <h3 className="text-lg font-semibold">Callsheet</h3>
         <div className="flex gap-2">
+          <CSVImportDialog
+            sessionId={session.id}
+            type="callsheet"
+            onSuccess={onUpdate}
+            buttonLabel="Import CSV"
+          />
           <Button variant="outline" onClick={handlePrint}>
             <Printer className="h-4 w-4 mr-2" />
             Print

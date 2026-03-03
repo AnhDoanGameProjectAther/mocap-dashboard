@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import type { Animation } from '@/types';
+import { CSVImportDialog } from './csv-import-dialog';
 
 interface AnimationsTableProps {
   sessionId: string;
@@ -224,10 +225,18 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h3 className="text-lg font-semibold">Animations ({animations.length})</h3>
-        <Button onClick={() => setIsAdding(true)}>
-          <Plus className="h-4 w-4 mr-2" />
-          Add Animation
-        </Button>
+        <div className="flex gap-2">
+          <CSVImportDialog
+            sessionId={sessionId}
+            type="animations"
+            onSuccess={onUpdate}
+            buttonLabel="Import CSV"
+          />
+          <Button onClick={() => setIsAdding(true)}>
+            <Plus className="h-4 w-4 mr-2" />
+            Add Animation
+          </Button>
+        </div>
       </div>
 
       <div className="border rounded-lg overflow-x-auto">
