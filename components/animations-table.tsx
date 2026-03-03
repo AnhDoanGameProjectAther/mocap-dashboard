@@ -239,7 +239,7 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-auto max-h-[calc(100vh-300px)]">
+      <div className="border rounded-lg overflow-auto max-h-[500px]">
         <Table className="w-max min-w-full">
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
