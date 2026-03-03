@@ -239,7 +239,7 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-auto">
+      <div className="border rounded-lg overflow-auto max-h-[calc(100vh-300px)]">
         <Table className="w-max min-w-full">
           <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
@@ -262,32 +262,32 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
             {animations.map((anim, idx) => (
               <TableRow
                 key={anim.id}
-                className="cursor-pointer hover:bg-muted/50 h-12"
+                className="cursor-pointer hover:bg-muted/50"
                 onClick={() => openEdit(anim)}
               >
-                <TableCell className="text-muted-foreground text-center">{idx + 1}</TableCell>
-                <TableCell>
+                <TableCell className="text-muted-foreground text-center align-top">{idx + 1}</TableCell>
+                <TableCell className="align-top">
                   <Badge className={`${priorityColors[anim.priority]} text-white text-xs`}>
                     {anim.priority}
                   </Badge>
                 </TableCell>
-                <TableCell className="truncate max-w-28" title={anim.character}>{anim.character}</TableCell>
-                <TableCell className="font-mono text-sm truncate max-w-24" title={anim.shotId}>{anim.shotId}</TableCell>
-                <TableCell className="font-medium truncate max-w-40" title={anim.moveName}>{anim.moveName}</TableCell>
-                <TableCell className="truncate max-w-20" title={anim.duration}>{anim.duration}</TableCell>
-                <TableCell className="truncate max-w-64" title={anim.description}>{anim.description}</TableCell>
-                <TableCell className="truncate max-w-64" title={anim.performerNotes}>{anim.performerNotes}</TableCell>
-                <TableCell className="truncate max-w-48" title={anim.keyPoses}>{anim.keyPoses}</TableCell>
-                <TableCell className="truncate max-w-36" title={anim.talentRequired}>{anim.talentRequired}</TableCell>
-                <TableCell className="truncate max-w-28" title={anim.props}>{anim.props}</TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
+                <TableCell className="whitespace-normal break-words align-top">{anim.character}</TableCell>
+                <TableCell className="font-mono text-sm whitespace-normal break-words align-top">{anim.shotId}</TableCell>
+                <TableCell className="font-medium whitespace-normal break-words align-top">{anim.moveName}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.duration}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.description}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.performerNotes}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.keyPoses}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.talentRequired}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.props}</TableCell>
+                <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
                   {uploadingId === anim.id ? (
                     <span className="text-sm text-muted-foreground">Uploading...</span>
                   ) : (
                     renderReferenceCell(anim)
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   <Button
                     variant="ghost"
                     size="icon"
