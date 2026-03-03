@@ -10,6 +10,7 @@ import { Badge } from '@/components/ui/badge';
 import { AnimationsTable } from '@/components/animations-table';
 import { Checklist } from '@/components/checklist';
 import { CallsheetView } from '@/components/callsheet';
+import { CharactersSection } from '@/components/characters-section';
 import type { SessionWithDetails } from '@/types';
 
 const statusColors: Record<string, string> = {
@@ -114,9 +115,12 @@ export default function SessionPage() {
 
         {/* Tabs */}
         <Tabs defaultValue="animations" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 md:w-auto">
+          <TabsList className="grid w-full grid-cols-4 md:w-auto">
             <TabsTrigger value="animations">
               Animations ({session.animations.length})
+            </TabsTrigger>
+            <TabsTrigger value="characters">
+              Characters ({session.characters.length})
             </TabsTrigger>
             <TabsTrigger value="checklist">
               Checklist ({session.checklist.filter(i => i.completed).length}/{session.checklist.length})
@@ -128,6 +132,14 @@ export default function SessionPage() {
             <AnimationsTable
               sessionId={session.id}
               animations={session.animations}
+              onUpdate={fetchSession}
+            />
+          </TabsContent>
+
+          <TabsContent value="characters" className="mt-6">
+            <CharactersSection
+              sessionId={session.id}
+              characters={session.characters}
               onUpdate={fetchSession}
             />
           </TabsContent>

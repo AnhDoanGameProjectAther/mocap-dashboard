@@ -50,8 +50,21 @@ export interface CallsheetInfo {
   specialInstructions: string;
 }
 
+export interface Character {
+  id: string;
+  sessionId: string;
+  name: string;
+  imageUrl: string;
+  description: string;
+  weaponName: string;
+  weaponImageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export type SessionWithDetails = Session & {
   animations: Animation[];
   checklist: ChecklistItem[];
   callsheet: CallsheetInfo | null;
+  characters: Character[];
 };

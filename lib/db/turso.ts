@@ -1,6 +1,6 @@
 import { createClient } from '@libsql/client';
 import { v4 as uuidv4 } from 'uuid';
-import type { Session, Animation, ChecklistItem, CallsheetInfo } from '@/types';
+import type { Session, Animation, ChecklistItem, CallsheetInfo, Character } from '@/types';
 
 // Turso database client
 const turso = createClient({
@@ -73,6 +73,21 @@ export async function initTursoDb() {
       specialInstructions TEXT DEFAULT ''
     )
   `);
+
+  // Characters table
+  await turso.execute(`
+    CREATE TABLE IF NOT EXISTS characters (
+      id TEXT PRIMARY KEY,
+      sessionId TEXT NOT NULL,
+      name TEXT NOT NULL,
+      imageUrl TEXT DEFAULT '',
+      description TEXT DEFAULT '',
+      weaponName TEXT DEFAULT '',
+      weaponImageUrl TEXT DEFAULT '',
+      createdAt TEXT DEFAULT CURRENT_TIMESTAMP,
+      updatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+    )
+  `);
 }
 
 // Sessions
@@ -141,10 +156,11 @@ export async function getSessionWithDetails(id: string) {
   const session = await getSession(id);
   if (!session) return null;
 
-  const [animationsResult, checklistResult, callsheetResult] = await Promise.all([
+  const [animationsResult, checklistResult, callsheetResult, charactersResult] = await Promise.all([
     turso.execute('SELECT * FROM animations WHERE sessionId = ? ORDER BY "order"', [id]),
     turso.execute('SELECT * FROM checklist WHERE sessionId = ? ORDER BY category, task', [id]),
     turso.execute('SELECT * FROM callsheets WHERE sessionId = ?', [id]),
+    turso.execute('SELECT * FROM characters WHERE sessionId = ? ORDER BY name', [id]),
   ]);
 
   const animations: Animation[] = animationsResult.rows.map(row => ({
@@ -186,11 +202,24 @@ export async function getSessionWithDetails(id: string) {
     specialInstructions: callsheetRow.specialInstructions as string,
   } : null;
 
+  const characters: Character[] = charactersResult.rows.map(row => ({
+    id: row.id as string,
+    sessionId: row.sessionId as string,
+    name: row.name as string,
+    imageUrl: row.imageUrl as string,
+    description: row.description as string,
+    weaponName: row.weaponName as string,
+    weaponImageUrl: row.weaponImageUrl as string,
+    createdAt: row.createdAt as string,
+    updatedAt: row.updatedAt as string,
+  }));
+
   return {
     ...session,
     animations,
     checklist,
     callsheet,
+    characters,
   };
 }
 
@@ -448,4 +477,81 @@ export async function updateCallsheet(sessionId: string, data: Partial<Callsheet
     wrapTime: row.wrapTime as string,
     specialInstructions: row.specialInstructions as string,
   };
+}
+
+// Characters
+export async function getCharactersBySession(sessionId: string): Promise<Character[]> {
+  const result = await turso.execute('SELECT * FROM characters WHERE sessionId = ? ORDER BY name', [sessionId]);
+  return result.rows.map(row => ({
+    id: row.id as string,
+    sessionId: row.sessionId as string,
+    name: row.name as string,
+    imageUrl: row.imageUrl as string,
+    description: row.description as string,
+    weaponName: row.weaponName as string,
+    weaponImageUrl: row.weaponImageUrl as string,
+    createdAt: row.createdAt as string,
+    updatedAt: row.updatedAt as string,
+  }));
+}
+
+export async function createCharacter(data: Omit<Character, 'id' | 'createdAt' | 'updatedAt'>): Promise<Character> {
+  const id = uuidv4();
+  const now = new Date().toISOString();
+
+  await turso.execute({
+    sql: `INSERT INTO characters (id, sessionId, name, imageUrl, description, weaponName, weaponImageUrl, createdAt, updatedAt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [id, data.sessionId, data.name, data.imageUrl || '', data.description || '', data.weaponName || '', data.weaponImageUrl || '', now, now],
+  });
+
+  return {
+    id,
+    sessionId: data.sessionId,
+    name: data.name,
+    imageUrl: data.imageUrl || '',
+    description: data.description || '',
+    weaponName: data.weaponName || '',
+    weaponImageUrl: data.weaponImageUrl || '',
+    createdAt: now,
+    updatedAt: now,
+  };
+}
+
+export async function updateCharacter(id: string, data: Partial<Character>): Promise<Character> {
+  const sets: string[] = [];
+  const values: any[] = [];
+
+  if (data.name !== undefined) { sets.push('name = ?'); values.push(data.name); }
+  if (data.imageUrl !== undefined) { sets.push('imageUrl = ?'); values.push(data.imageUrl); }
+  if (data.description !== undefined) { sets.push('description = ?'); values.push(data.description); }
+  if (data.weaponName !== undefined) { sets.push('weaponName = ?'); values.push(data.weaponName); }
+  if (data.weaponImageUrl !== undefined) { sets.push('weaponImageUrl = ?'); values.push(data.weaponImageUrl); }
+
+  sets.push('updatedAt = ?');
+  values.push(new Date().toISOString());
+  values.push(id);
+
+  await turso.execute({
+    sql: `UPDATE characters SET ${sets.join(', ')} WHERE id = ?`,
+    args: values,
+  });
+
+  const result = await turso.execute('SELECT * FROM characters WHERE id = ?', [id]);
+  const row = result.rows[0];
+  return {
+    id: row.id as string,
+    sessionId: row.sessionId as string,
+    name: row.name as string,
+    imageUrl: row.imageUrl as string,
+    description: row.description as string,
+    weaponName: row.weaponName as string,
+    weaponImageUrl: row.weaponImageUrl as string,
+    createdAt: row.createdAt as string,
+    updatedAt: row.updatedAt as string,
+  };
+}
+
+export async function deleteCharacter(id: string): Promise<void> {
+  await turso.execute({ sql: 'DELETE FROM characters WHERE id = ?', args: [id] });
 }
