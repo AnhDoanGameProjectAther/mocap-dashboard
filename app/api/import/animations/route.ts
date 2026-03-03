@@ -45,6 +45,11 @@ export async function POST(request: NextRequest) {
         const moveName = row[fieldMapping['moveName']]?.trim();
         if (!moveName) continue; // Skip empty rows
 
+        const referenceUrl = fieldMapping['referenceUrl'] !== undefined ? row[fieldMapping['referenceUrl']]?.trim() || '' : '';
+
+        // Detect if reference is an image
+        const isImage = referenceUrl && /\.(jpg|jpeg|png|gif|webp|svg|bmp|ico)$/i.test(referenceUrl);
+
         await createAnimation({
           sessionId,
           character: fieldMapping['character'] !== undefined ? row[fieldMapping['character']]?.trim() || '' : '',
@@ -56,8 +61,8 @@ export async function POST(request: NextRequest) {
           keyPoses: fieldMapping['keyPoses'] !== undefined ? row[fieldMapping['keyPoses']]?.trim() || '' : '',
           talentRequired: fieldMapping['talentRequired'] !== undefined ? row[fieldMapping['talentRequired']]?.trim() || '' : '',
           props: fieldMapping['props'] !== undefined ? row[fieldMapping['props']]?.trim() || '' : '',
-          referenceType: 'link',
-          referenceUrl: fieldMapping['referenceUrl'] !== undefined ? row[fieldMapping['referenceUrl']]?.trim() || '' : '',
+          referenceType: isImage ? 'file' : 'link',
+          referenceUrl,
           priority: (fieldMapping['priority'] !== undefined ? row[fieldMapping['priority']]?.trim() : 'Medium') as 'Low' | 'Medium' | 'High' || 'Medium',
           order: i - 1,
         });
