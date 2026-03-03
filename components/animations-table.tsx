@@ -234,18 +234,18 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-8"></TableHead>
-              <TableHead>Priority</TableHead>
-              <TableHead>Character</TableHead>
-              <TableHead>Shot ID</TableHead>
-              <TableHead>Move Name</TableHead>
-              <TableHead>Duration</TableHead>
-              <TableHead>Description</TableHead>
-              <TableHead>Performer Notes</TableHead>
-              <TableHead>Key Poses</TableHead>
-              <TableHead>Talent Required</TableHead>
-              <TableHead>Props</TableHead>
-              <TableHead>Reference</TableHead>
+              <TableHead className="w-8">#</TableHead>
+              <TableHead className="w-20">Priority</TableHead>
+              <TableHead className="min-w-[120px]">Character</TableHead>
+              <TableHead className="min-w-[100px]">Shot ID</TableHead>
+              <TableHead className="min-w-[150px]">Move Name</TableHead>
+              <TableHead className="w-24">Duration</TableHead>
+              <TableHead className="min-w-[200px]">Description</TableHead>
+              <TableHead className="min-w-[200px]">Performer Notes</TableHead>
+              <TableHead className="min-w-[200px]">Key Poses</TableHead>
+              <TableHead className="min-w-[150px]">Talent Required</TableHead>
+              <TableHead className="min-w-[120px]">Props</TableHead>
+              <TableHead className="min-w-[100px]">Reference</TableHead>
               <TableHead className="w-16"></TableHead>
             </TableRow>
           </TableHeader>
@@ -256,29 +256,29 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
                 className="cursor-pointer hover:bg-muted/50"
                 onClick={() => openEdit(anim)}
               >
-                <TableCell className="text-muted-foreground">{idx + 1}</TableCell>
-                <TableCell>
+                <TableCell className="text-muted-foreground align-top">{idx + 1}</TableCell>
+                <TableCell className="align-top">
                   <Badge className={`${priorityColors[anim.priority]} text-white`}>
                     {anim.priority}
                   </Badge>
                 </TableCell>
-                <TableCell>{anim.character}</TableCell>
-                <TableCell className="font-mono text-sm">{anim.shotId}</TableCell>
-                <TableCell className="font-medium">{anim.moveName}</TableCell>
-                <TableCell>{anim.duration}</TableCell>
-                <TableCell className="max-w-xs truncate">{anim.description}</TableCell>
-                <TableCell className="max-w-xs truncate">{anim.performerNotes}</TableCell>
-                <TableCell className="max-w-xs truncate">{anim.keyPoses}</TableCell>
-                <TableCell>{anim.talentRequired}</TableCell>
-                <TableCell>{anim.props}</TableCell>
-                <TableCell onClick={(e) => e.stopPropagation()}>
+                <TableCell className="whitespace-normal break-words align-top">{anim.character}</TableCell>
+                <TableCell className="font-mono text-sm whitespace-normal break-words align-top">{anim.shotId}</TableCell>
+                <TableCell className="font-medium whitespace-normal break-words align-top">{anim.moveName}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.duration}</TableCell>
+                <TableCell className="max-w-[200px] whitespace-normal break-words align-top">{anim.description}</TableCell>
+                <TableCell className="max-w-[200px] whitespace-normal break-words align-top">{anim.performerNotes}</TableCell>
+                <TableCell className="max-w-[200px] whitespace-normal break-words align-top">{anim.keyPoses}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.talentRequired}</TableCell>
+                <TableCell className="whitespace-normal break-words align-top">{anim.props}</TableCell>
+                <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
                   {uploadingId === anim.id ? (
                     <span className="text-sm text-muted-foreground">Uploading...</span>
                   ) : (
                     renderReferenceCell(anim)
                   )}
                 </TableCell>
-                <TableCell>
+                <TableCell className="align-top">
                   <Button
                     variant="ghost"
                     size="icon"
