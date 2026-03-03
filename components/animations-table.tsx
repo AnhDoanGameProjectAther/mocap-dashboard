@@ -239,58 +239,59 @@ export function AnimationsTable({ sessionId, animations, onUpdate }: AnimationsT
         </div>
       </div>
 
-      <div className="border rounded-lg overflow-x-auto">
-        <Table>
-          <TableHeader>
+      <div className="border rounded-lg overflow-auto max-h-[calc(100vh-280px)]">
+        <Table className="w-max min-w-full">
+          <TableHeader className="sticky top-0 bg-background z-10">
             <TableRow>
-              <TableHead className="w-8">#</TableHead>
+              <TableHead className="w-10 text-center">#</TableHead>
               <TableHead className="w-20">Priority</TableHead>
-              <TableHead className="min-w-[120px]">Character</TableHead>
-              <TableHead className="min-w-[100px]">Shot ID</TableHead>
-              <TableHead className="min-w-[150px]">Move Name</TableHead>
-              <TableHead className="w-24">Duration</TableHead>
-              <TableHead className="min-w-[200px]">Description</TableHead>
-              <TableHead className="min-w-[200px]">Performer Notes</TableHead>
-              <TableHead className="min-w-[200px]">Key Poses</TableHead>
-              <TableHead className="min-w-[150px]">Talent Required</TableHead>
-              <TableHead className="min-w-[120px]">Props</TableHead>
-              <TableHead className="min-w-[100px]">Reference</TableHead>
-              <TableHead className="w-16"></TableHead>
+              <TableHead className="w-28">Character</TableHead>
+              <TableHead className="w-24">Shot ID</TableHead>
+              <TableHead className="w-40">Move Name</TableHead>
+              <TableHead className="w-20">Duration</TableHead>
+              <TableHead className="w-64">Description</TableHead>
+              <TableHead className="w-64">Performer Notes</TableHead>
+              <TableHead className="w-48">Key Poses</TableHead>
+              <TableHead className="w-36">Talent Required</TableHead>
+              <TableHead className="w-28">Props</TableHead>
+              <TableHead className="w-32">Reference</TableHead>
+              <TableHead className="w-12"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {animations.map((anim, idx) => (
               <TableRow
                 key={anim.id}
-                className="cursor-pointer hover:bg-muted/50"
+                className="cursor-pointer hover:bg-muted/50 h-12"
                 onClick={() => openEdit(anim)}
               >
-                <TableCell className="text-muted-foreground align-top">{idx + 1}</TableCell>
-                <TableCell className="align-top">
-                  <Badge className={`${priorityColors[anim.priority]} text-white`}>
+                <TableCell className="text-muted-foreground text-center">{idx + 1}</TableCell>
+                <TableCell>
+                  <Badge className={`${priorityColors[anim.priority]} text-white text-xs`}>
                     {anim.priority}
                   </Badge>
                 </TableCell>
-                <TableCell className="whitespace-normal break-words align-top">{anim.character}</TableCell>
-                <TableCell className="font-mono text-sm whitespace-normal break-words align-top">{anim.shotId}</TableCell>
-                <TableCell className="font-medium whitespace-normal break-words align-top">{anim.moveName}</TableCell>
-                <TableCell className="whitespace-normal break-words align-top">{anim.duration}</TableCell>
-                <TableCell className="max-w-[200px] whitespace-normal break-words align-top">{anim.description}</TableCell>
-                <TableCell className="max-w-[200px] whitespace-normal break-words align-top">{anim.performerNotes}</TableCell>
-                <TableCell className="max-w-[200px] whitespace-normal break-words align-top">{anim.keyPoses}</TableCell>
-                <TableCell className="whitespace-normal break-words align-top">{anim.talentRequired}</TableCell>
-                <TableCell className="whitespace-normal break-words align-top">{anim.props}</TableCell>
-                <TableCell className="align-top" onClick={(e) => e.stopPropagation()}>
+                <TableCell className="truncate max-w-28" title={anim.character}>{anim.character}</TableCell>
+                <TableCell className="font-mono text-sm truncate max-w-24" title={anim.shotId}>{anim.shotId}</TableCell>
+                <TableCell className="font-medium truncate max-w-40" title={anim.moveName}>{anim.moveName}</TableCell>
+                <TableCell className="truncate max-w-20" title={anim.duration}>{anim.duration}</TableCell>
+                <TableCell className="truncate max-w-64" title={anim.description}>{anim.description}</TableCell>
+                <TableCell className="truncate max-w-64" title={anim.performerNotes}>{anim.performerNotes}</TableCell>
+                <TableCell className="truncate max-w-48" title={anim.keyPoses}>{anim.keyPoses}</TableCell>
+                <TableCell className="truncate max-w-36" title={anim.talentRequired}>{anim.talentRequired}</TableCell>
+                <TableCell className="truncate max-w-28" title={anim.props}>{anim.props}</TableCell>
+                <TableCell onClick={(e) => e.stopPropagation()}>
                   {uploadingId === anim.id ? (
                     <span className="text-sm text-muted-foreground">Uploading...</span>
                   ) : (
                     renderReferenceCell(anim)
                   )}
                 </TableCell>
-                <TableCell className="align-top">
+                <TableCell>
                   <Button
                     variant="ghost"
                     size="icon"
+                    className="h-8 w-8"
                     onClick={(e) => {
                       e.stopPropagation();
                       handleDelete(anim.id);
